@@ -1,3 +1,5 @@
+import { Response } from "express";
+
 const express = require( "express" );
 const router = express.Router();
 const {
@@ -6,124 +8,128 @@ const {
 
 const idlength = 8
 
+export class books {
 /**
  * @swagger
  * components:
  *  schemas:
- *      Classes:
+ *      Book:
  *          type: object
  *          required:
- *              - name
+ *              - title
+ *              - author
  *          properties:
  *              id:
  *                  type: string
- *                  description: The auto-generated id of the classes
- *              name:
+ *                  description: The auto-generated id of the book
+ *              title:
  *                  type: string
- *                  description: The classes Name
- *              
+ *                  description: The book title
+ *              author: 
+ *                  type: string
+ *                  description: The Book author
  *          example:
  *              id: sddsf_fel
- *              name: Cleric
- *              
+ *              title: This Book
+ *              author: this Author
  */
-
- /**
-  * @swagger
-  * tags:
-  *     name: Classes
-  *     description : "Class of Character api"
-  * 
-  */
 
 /**
  * @swagger
- * /classes:
+ * tags:
+ *     name: Books
+ *     description : "books api"
+ * 
+ */
+
+/**
+ * @swagger
+ * /books:
  *     get:
- *         summary: returns list of all classeses
- *         tags: [Classes] 
+ *         summary: returns list of all books
+ *         tags: [Books] 
  *         responses: 
  *             200:
- *                 decsription: List of classes
+ *                 decsription: List of books
  *                 content: 
  *                     application/json:
  *                          schema:
  *                              type: array
  *                              items:
- *                                  $ref: '#components/schemas/Classes'
+ *                                  $ref: '#components/schemas/Book'
  */
 
-router.get( "/", ( req, res ) => {
-    const classes = req.app.db.get( "classes" )
+router.get( "/books", ( req, res ) => {
+    const books = req.app.db.get( "books" )
 
-    res.send( classes )
+    res.send( books )
 } )
 
 /**
  * @swagger
- * /classes/{id}:
+ * /books/{id}:
  *      get:
- *          summary: get classes by ID
- *          tags: [Classes]
+ *          summary: get book by ID
+ *          tags: [Books]
  *          parameters: 
  *              - in: path
  *                name: id
  *                schema:
  *                  type: string
  *                required: true
- *                description: classes ID
+ *                description: Book ID
  *          responses:
  *              200:
- *                  description: The classes description by id
+ *                  description: The book description by id
  *                  contents: 
  *                      application/json:
  *                          schema:
- *                              $ref: '#/components/schemas/Classes'
+ *                              $ref: '#/components/schemas/Book'
  *              404:
- *                  description: the classes not found 
+ *                  description: the book not found 
  *                  
  * 
  */
 
 router.get( "/:id", ( req, res ) => {
-    const classes = req.app.db.get( "classes" ).find( {
+    const book = req.app.db.get( "books" ).find( {
         id: req.params.id
     } ).value()
 
-    res.send( classes )
+    res.send( book )
 } )
 
 /**
  * @swagger
- * /classes:
- *     post:
+ * /books:
+ *  post:
  *      summary: Create new Book
- *      tags: [Classes]
+ *      tags: [Books]
  *      requestBody:
  *          required: true
  *          content: 
  *              application/json:
  *                  schema:
- *                      $ref: '#/components/schemas/Classes'
+ *                      $ref: '#/components/schemas/Book'
  *      responses:
  *          200:
- *              description: the Class was succesfully created
+ *              description: the booke was succesfully created
  *              content: 
  *                  application/json:
  *                      schema: 
- *                          $ref: '#/components/schemas/Classes'
+ *                          $ref: '#/components/schemas/Book'
  *          500:
  *              desscription: server error
  */
 
 router.post( "/", ( req, res ) => {
     try {
-        const classes = {
+        const book = {
             id: nanoid( idlength ),
             ...req.body
         }
-        req.app.db.get( "classes" ).push( classes ).write();
-        res.send(classes);
+        req.app.db.get( "books" ).push( book ).write();
+        res.send( book );
     } catch ( error ) {
         return res.status( 500 ).send( error )
     }
@@ -131,43 +137,43 @@ router.post( "/", ( req, res ) => {
 
 /**
  * @swagger
- * /classes/{id}:
+ * /books/{id}:
  *      put:
- *          summary: update class by ID
- *          tags: [Classes]
+ *          summary: update book by ID
+ *          tags: [Books]
  *          parameters: 
  *              - in: path
  *                name: id
  *                schema:
  *                  type: string
  *                required: true
- *                description: The Class ID
+ *                description: The Book ID
  *          requestBody:
  *              required: true
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/Classes'
+ *                          $ref: '#/components/schemas/Book'
  *          responses:
  *              200:
- *                  description: The class was updated
+ *                  description: The book was updated
  *                  content: 
  *                      application/json:
  *                          schema:
- *                              $ref: '#/components/schemas/Classes'
+ *                              $ref: '#/components/schemas/Book'
  *              404:
- *                  description: class not found
+ *                  description: book not found
  *              500:
  *                  description: server error
  */
 
-router.put( "/:id", ( req, res ) => {
+router.put( "/:id", ( req:Request, res: Response ) => {
     try {
-        req.app.db.get( "classes" ).find( {
+        req.app.db.get( "books" ).find( {
             id: req.params.id
         } ).assign( req.body ).write()
 
-        res.send( req.app.db.get( "classes" ).find( {
+        res.send( req.app.db.get( "books" ).find( {
             id: req.params.id
         } ) )
     } catch ( error ) {
@@ -177,31 +183,31 @@ router.put( "/:id", ( req, res ) => {
 
 /**
  * @swagger
- * /classes/{id}:
+ * /books/{id}:
  *  delete:
- *      summary: Remove the class by id
- *      tags: [Classes]
+ *      summary: Remove the book by id
+ *      tags: [Books]
  *      parameters:
  *          - in: path
  *            name: id
  *            schema:
  *              type: string
  *            required: true
- *            description: the class id
+ *            description: the book id
  *      responses:
  *          200:
- *              description: the class was removed
+ *              description: the book was removed
  *          404: 
- *              description: the class was not found
+ *              description: the book was not found
  * 
 */
-
-router.delete( "/:id", ( req, res ) => {
-    req.app.db.get( "classes" ).remove( {
+router.delete( "/:id", ( req: Request, res: Response ) => {
+    req.app.db.get( "books" ).remove( {
         id: req.params.id
     } ).write()
 
     res.sendStatus( 200 )
 } )
 
-module.exports = router;
+}
+

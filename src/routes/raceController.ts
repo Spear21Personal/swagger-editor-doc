@@ -1,132 +1,138 @@
-const express = require( "express" );
+import express, {Application, Request, Response, NextFunction, Router} from 'express';
 const router = express.Router();
 const {
     nanoid
 } = require( "nanoid" );
 
 const idlength = 8
+export default class raceController {
 
-/**
+    constructor() {
+         /**
  * @swagger
  * components:
  *  schemas:
- *      Book:
+ *      Race:
  *          type: object
  *          required:
- *              - title
- *              - author
+ *              - name
  *          properties:
  *              id:
  *                  type: string
- *                  description: The auto-generated id of the book
- *              title:
+ *                  description: The auto-generated id of the race
+ *              name:
  *                  type: string
- *                  description: The book title
- *              author: 
+ *                  description: The race Name 
+ *              abilityBonuses:
+ *                  type: array
+ *                  description: Race bonuses
+ *              details:
  *                  type: string
- *                  description: The Book author
+ *                  description: brief detail of race 
  *          example:
- *              id: sddsf_fel
- *              title: This Book
- *              author: this Author
+ *              id: O9oELOcM
+ *              name: Human
+ *              abilityBonuses: []
+ *              details: Humans are the most adaptable and ambitious people among the common races.
+ *              
  */
+
+ /**
+  * @swagger
+  * tags:
+  *     name: Race
+  *     description : "Race of Character api"
+  * 
+  */
 
 /**
  * @swagger
- * tags:
- *     name: Books
- *     description : "books api"
- * 
- */
-
-/**
- * @swagger
- * /books:
+ * /race:
  *     get:
- *         summary: returns list of all books
- *         tags: [Books] 
+ *         summary: returns list of all racees
+ *         tags: [Race] 
  *         responses: 
  *             200:
- *                 decsription: List of books
+ *                 decsription: List of race
  *                 content: 
  *                     application/json:
  *                          schema:
  *                              type: array
  *                              items:
- *                                  $ref: '#components/schemas/Book'
+ *                                  $ref: '#components/schemas/Race'
  */
 
-router.get( "/", ( req, res ) => {
-    const books = req.app.db.get( "books" )
+router.get( "/race", ( req, res ) => {
+    const race = req.app.db.get( "race" )
 
-    res.send( books )
+    res.send( race )
 } )
 
 /**
  * @swagger
- * /books/{id}:
+ * /race/{id}:
  *      get:
- *          summary: get book by ID
- *          tags: [Books]
+ *          summary: get race by ID
+ *          tags: [Race]
  *          parameters: 
  *              - in: path
  *                name: id
  *                schema:
  *                  type: string
  *                required: true
- *                description: Book ID
+ *                description: race ID
  *          responses:
  *              200:
- *                  description: The book description by id
+ *                  description: The race description by id
  *                  contents: 
  *                      application/json:
  *                          schema:
- *                              $ref: '#/components/schemas/Book'
+ *                              $ref: '#/components/schemas/Race'
  *              404:
- *                  description: the book not found 
+ *                  description: the race not found 
  *                  
  * 
  */
 
 router.get( "/:id", ( req, res ) => {
-    const book = req.app.db.get( "books" ).find( {
+    const race = req.app.db.get( "race" ).find( {
         id: req.params.id
     } ).value()
 
-    res.send( book )
+    res.send( race )
 } )
 
 /**
  * @swagger
- * /books:
- *  post:
- *      summary: Create new Book
- *      tags: [Books]
+ * /race:
+ *   post:
+ *      summary: Create new Race
+ *      tags: [Race]
  *      requestBody:
  *          required: true
  *          content: 
  *              application/json:
  *                  schema:
- *                      $ref: '#/components/schemas/Book'
+ *                      $ref: '#/components/schemas/Race'
  *      responses:
  *          200:
- *              description: the booke was succesfully created
+ *              description: the Race was succesfully created
  *              content: 
  *                  application/json:
  *                      schema: 
- *                          $ref: '#/components/schemas/Book'
+ *                          $ref: '#/components/schemas/Race'
  *          500:
  *              desscription: server error
  */
 
 router.post( "/", ( req, res ) => {
     try {
-        const book = {
+        const race = {
             id: nanoid( idlength ),
             ...req.body
         }
-        req.app.db.get( "books" ).push( book ).write();
-        res.send( book );
+        req.app.db.get( "race" ).push( race ).write();
+        res.send(race);
     } catch ( error ) {
         return res.status( 500 ).send( error )
     }
@@ -134,43 +140,43 @@ router.post( "/", ( req, res ) => {
 
 /**
  * @swagger
- * /books/{id}:
+ * /race/{id}:
  *      put:
- *          summary: update book by ID
- *          tags: [Books]
+ *          summary: update race by ID
+ *          tags: [Race]
  *          parameters: 
  *              - in: path
  *                name: id
  *                schema:
  *                  type: string
  *                required: true
- *                description: The Book ID
+ *                description: The Race ID
  *          requestBody:
  *              required: true
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/Book'
+ *                          $ref: '#/components/schemas/Race'
  *          responses:
  *              200:
- *                  description: The book was updated
+ *                  description: The race was updated
  *                  content: 
  *                      application/json:
  *                          schema:
- *                              $ref: '#/components/schemas/Book'
+ *                              $ref: '#/components/schemas/Race'
  *              404:
- *                  description: book not found
+ *                  description: race not found
  *              500:
  *                  description: server error
  */
 
 router.put( "/:id", ( req, res ) => {
     try {
-        req.app.db.get( "books" ).find( {
+        req.app.db.get( "race" ).find( {
             id: req.params.id
         } ).assign( req.body ).write()
 
-        res.send( req.app.db.get( "books" ).find( {
+        res.send( req.app.db.get( "race" ).find( {
             id: req.params.id
         } ) )
     } catch ( error ) {
@@ -180,30 +186,34 @@ router.put( "/:id", ( req, res ) => {
 
 /**
  * @swagger
- * /books/{id}:
+ * /race/{id}:
  *  delete:
- *      summary: Remove the book by id
- *      tags: [Books]
+ *      summary: Remove the race by id
+ *      tags: [Race]
  *      parameters:
  *          - in: path
  *            name: id
  *            schema:
  *              type: string
  *            required: true
- *            description: the book id
+ *            description: the race id
  *      responses:
  *          200:
- *              description: the book was removed
+ *              description: the race was removed
  *          404: 
- *              description: the book was not found
+ *              description: the race was not found
  * 
 */
+
 router.delete( "/:id", ( req, res ) => {
-    req.app.db.get( "books" ).remove( {
+    req.app.db.get( "race" ).remove( {
         id: req.params.id
     } ).write()
 
     res.sendStatus( 200 )
 } )
+    }
+   
+}
 
-module.exports = router;
+
